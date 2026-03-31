@@ -17,16 +17,16 @@ PICS = (environ.get('PICS', 'https://graph.org/file/47d57543609f1faddbc6a.jpg ht
 ADMINS = [int(admin) if id_pattern.search(admin) else admin for admin in environ.get('ADMINS', '885675538 2134408112 6846236707').split()] # For Multiple Id Use One Space Between Each.
 auth_users = [int(user) if id_pattern.search(user) else user for user in environ.get('AUTH_USERS', '885675538 2134408112 6846236707').split()]  # For Multiple Id Use One Space Between Each.
 AUTH_USERS = (auth_users + ADMINS) if auth_users else []
-LOG_CHANNEL = int(environ.get('LOG_CHANNEL', '-1001723140225')) # This Channel Is For When User Start Your Bot Then Bot Send That User Name And Id In This Log Channel, Same For Group Also.
-CHANNELS = [int(ch) if id_pattern.search(ch) else ch for ch in environ.get('CHANNELS', '-1001825890594 -1002621661648 -1002653845645').split()]  # For Multiple Id Use One Space Between Each.
-auth_channel = environ.get('AUTH_CHANNEL', '-1001457939263') # give your force subscribe channel id here else leave it blank
+LOG_CHANNEL = int(environ.get('LOG_CHANNEL', '-1003725961309')) # This Channel Is For When User Start Your Bot Then Bot Send That User Name And Id In This Log Channel, Same For Group Also.
+CHANNELS = [int(ch) if id_pattern.search(ch) else ch for ch in environ.get('CHANNELS', '-1003813513961').split()]  # For Multiple Id Use One Space Between Each.
+auth_channel = environ.get('AUTH_CHANNEL', '-1003062629837') # give your force subscribe channel id here else leave it blank
 AUTH_CHANNEL = int(auth_channel) if auth_channel and id_pattern.search(auth_channel) else None # This Is Force Subscribe Channel, also known as Auth Channel 
 INDEX_REQ_CHANNEL = int(environ.get('INDEX_REQ_CHANNEL', LOG_CHANNEL)) # This Channel Is For Index Request
 reqst_channel = environ.get('REQST_CHANNEL', '') # This Channel Is For When User Request Any File Name With command or hashtag like - /request or #request
 REQST_CHANNEL = int(reqst_channel) if reqst_channel and id_pattern.search(reqst_channel) else None 
-support_chat_id = environ.get('SUPPORT_CHAT_ID', '') # This Is Your Bot Support Group Id , Here Bot Will Not Give File Because This Is Support Group.
+support_chat_id = environ.get('SUPPORT_CHAT_ID', '-1003219334269') # This Is Your Bot Support Group Id , Here Bot Will Not Give File Because This Is Support Group.
 SUPPORT_CHAT_ID = int(support_chat_id) if support_chat_id and id_pattern.search(support_chat_id) else None
-DELETE_CHANNELS = [int(dch) if id_pattern.search(dch) else dch for dch in environ.get('DELETE_CHANNELS', '0').split()]  # For Multiple Id Use One Space Between Each.# This Channel Is For Delete Index File, Forward Your File In This Channel Which You Want To Delete Then Bot Automatically Delete That File From Database.
+DELETE_CHANNELS = [int(dch) if id_pattern.search(dch) else dch for dch in environ.get('DELETE_CHANNELS', '-1003522165861').split()]  # For Multiple Id Use One Space Between Each.# This Channel Is For Delete Index File, Forward Your File In This Channel Which You Want To Delete Then Bot Automatically Delete That File From Database.
 
 # if REQUEST_TO_JOIN_MODE is true then force subscribe work like request to join fsub, else if false then work like normal fsub.
 REQUEST_TO_JOIN_MODE = bool(environ.get('REQUEST_TO_JOIN_MODE', False)) # Set True Or False
@@ -34,8 +34,8 @@ TRY_AGAIN_BTN = bool(environ.get('TRY_AGAIN_BTN', False)) # Set True Or False (T
 
 # MongoDB information
 DATABASE_URI = environ.get('DATABASE_URI', "mongodb+srv://urlmongodb:AAZWxt6Fbw3G2MZR@cluster0.kolo6q0.mongodb.net/?retryWrites=true&w=majority")# IF Multiple Database Is False Then Fill Only This Database Url.
-DATABASE_NAME = environ.get('DATABASE_NAME', "cluster0")
-COLLECTION_NAME = environ.get('COLLECTION_NAME', 'Telegram_Files')
+DATABASE_NAME = environ.get('DATABASE_NAME', "cluster0xx")
+COLLECTION_NAME = environ.get('COLLECTION_NAME', 'Telegram_F')
 
 #Modes Calls and True & False
 # Premium And Referal Settings
