@@ -651,68 +651,68 @@ async def log_file(bot, message):
         await message.reply(str(e))
 
 @Client.on_message(filters.command('delete') & filters.user(ADMINS))
-async def delete_media(bot: Client, message: Message):
-    # Kurigram ka .ask feature use kar rahe hain
-    answer = await bot.ask(
-        chat_id=message.from_user.id, 
-        text="**Now Send Me Media Which You Want to delete**",
-        filters=(filters.document | filters.video | filters.audio),
-        timeout=60 # Optional: 1 minute ka limit
-    )
-
-    # Agar user ne galat format bheja ya timeout hua
-    if not answer or not answer.media:
-        await message.reply("❌ **Invalid media or Request timed out!**\nPlease send a Document, Video, or Audio.")
+async def delete(bot, message):
+    reply = await bot.ask(message.from_user.id, "Now Send Me Media Which You Want to delete")
+    if reply.media:
+        msg = await message.reply("Processing...⏳", quote=True)
+    else:
+        await message.reply('Send Me Video, File Or Document.', quote=True)
         return
 
-    msg = await message.reply("Processing... ⏳", quote=True)
-
-    # Media object extract karna (Kurigram simplifies media access)
-    media = getattr(answer, answer.media.value)
-    
-    # File ID Unpack (Ensure this function is imported/defined)
-    try:
-        file_id, _ = unpack_new_file_id(media.file_id)
-    except Exception:
-        file_id = media.file_id # Fallback agar unpack fail ho
-
-    # Deletion Logic with fallback
-    deleted = False
-    
-    # 1. Try deleting by File ID (Sabse accurate)
-    for db in [col, sec_col]:
-        res = db.delete_one({'file_id': file_id})
-        if res.deleted_count:
-            deleted = True
+    for file_type in ("document", "video", "audio"):
+        media = getattr(reply, file_type, None)
+        if media is not None:
             break
-
-    # 2. Agar ID se nahi mila, toh Name/Size se try karein
-    if not deleted:
-        original_name = getattr(media, 'file_name', '')
-        # Name Clean karne ka logic
-        clean_name = original_name
-        for char in ['[', ']', '(', ')']:
-            clean_name = clean_name.replace(char, '')
-        clean_name = ' '.join(filter(lambda x: not x.startswith('@'), clean_name.split()))
-
-        search_filters = [
-            {'file_name': clean_name, 'file_size': media.file_size},
-            {'file_name': original_name, 'file_size': media.file_size}
-        ]
-
-        for query in search_filters:
-            for db in [col, sec_col]:
-                res = db.delete_many(query)
-                if res.deleted_count:
-                    deleted = True
-                    break
-            if deleted: break
-
-    # Final Result
-    if deleted:
-        await msg.edit("✅ **File successfully deleted from database!**")
     else:
-        await msg.edit("❌ **File not found in database.**")
+        await msg.edit('This is not supported file format')
+        return
+    
+    file_id, file_ref = unpack_new_file_id(media.file_id)
+
+    result = col.delete_one({
+        'file_id': file_id,
+    })
+    if not result.deleted_count:
+        result = sec_col.delete_one({
+            'file_id': file_id,
+        })
+    if result.deleted_count:
+        await msg.edit('File is successfully deleted from database')
+    else:
+        file_name = re.sub(r"(_|\-|\.|\+)", " ", str(media.file_name))
+        unwanted_chars = ['[', ']', '(', ')']
+        for char in unwanted_chars:
+            file_name = file_name.replace(char, '')
+        file_name = ' '.join(filter(lambda x: not x.startswith('@'), file_name.split()))
+    
+        result = col.delete_many({
+            'file_name': file_name,
+            'file_size': media.file_size
+        })
+        if not result.deleted_count:
+            result = sec_col.delete_many({
+                'file_name': file_name,
+                'file_size': media.file_size
+            })
+        if result.deleted_count:
+            await msg.edit('File is successfully deleted from database')
+        else:
+            # files indexed before https://github.com/EvamariaTG/EvaMaria/commit/f3d2a1bcb155faf44178e5d7a685a1b533e714bf#diff-86b613edf1748372103e94cacff3b578b36b698ef9c16817bb98fe9ef22fb669R39 
+            # have original file name.
+            result = col.delete_many({
+                'file_name': media.file_name,
+                'file_size': media.file_size
+            })
+            if not result.deleted_count:
+                result = sec_col.delete_many({
+                    'file_name': media.file_name,
+                    'file_size': media.file_size
+                })
+            if result.deleted_count:
+                await msg.edit('File is successfully deleted from database')
+            else:
+                await msg.edit('File not found in database')
+
 
 
 @Client.on_message(filters.command('deleteall') & filters.user(ADMINS))
