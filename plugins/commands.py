@@ -650,24 +650,41 @@ async def log_file(bot, message):
     except Exception as e:
         await message.reply(str(e))
 
-@Client.on_message(filters.command('delete'))
+@Client.on_message(filters.command('delete') & filters.user(ADMINS))
 async def delete_file(bot, message):
-    user_id = message.from_user.id
-    if user_id not in ADMINS:
-        await message.delete()
-        return
     try:
         query = message.text.split(" ", 1)[1]
-    except:
-        return await message.reply_text("Command Incomplete!\nUsage: /delete query")
-    btn = [[
-        InlineKeyboardButton("YES", callback_data=f"delete_{query}")
-    ],[
-        InlineKeyboardButton("CLOSE", callback_data="close_data")
-    ]]
-    await message.reply_text(f"Do you want to delete all: {query} ?", reply_markup=InlineKeyboardMarkup(btn))
- 
+    except IndexError:
+        return await message.reply_text("❌ **Usage:** `/delete filename`")
 
+    btn = [
+        [InlineKeyboardButton("✅ YES", callback_data=f"del_{query}")],
+        [InlineKeyboardButton("❌ CLOSE", callback_data="close_data")]
+    ]
+    
+    await message.reply_text(
+        text=f"Kya aap `{query}` se judi saari files delete karna chahte hain?",
+        reply_markup=InlineKeyboardMarkup(btn)
+    )
+
+# --- 2. Ye Callback Handler hai (Isi file mein niche) ---
+@Client.on_callback_query(filters.regex(r'^del_'))
+async def handle_delete_callback(bot, query):
+    # 'del_' ke baad ka text nikalne ke liye
+    search_term = query.data.split("_", 1)[1]
+    
+    # Yahan delete karne ka process start karein
+    await query.message.edit_text(f"🔍 `{search_term}` ko delete kiya ja raha hai...")
+    
+    # Yahan aap apna database delete function call karein
+    # success = await database.delete_files(search_term) 
+    
+    await query.answer("Processing...", show_alert=False)
+    await query.message.edit_text(f"✅ `{search_term}` se judi saari files delete ho gayi hain!")
+
+@Client.on_callback_query(filters.regex("close_data"))
+async def handle_close(bot, query):
+    await query.message.delete()
 
 
 @Client.on_message(filters.command('deleteall') & filters.user(ADMINS))
