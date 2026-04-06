@@ -189,10 +189,10 @@ async def index_files_to_db(lst_msg_id, chat, msg, bot):
             await msg.edit(f"**Indexing Stopped due to Error:**\n`{e}`")
         else:
             await msg.edit(
-                f"✅ **Indexing Successfully Completed!**\n\n"
-                f"📂 Total Saved: `{total_files}`\n"
-                f"⏩ Duplicates: `{duplicate}`\n"
-                f"❌ Errors: `{errors}`\n"
-                f"🗑️ Deleted/Empty: `{deleted}`\n"
-                f"🚫 Non-Media: `{no_media + unsupported}`"
-            
+                text=f"✅ **Indexing Successfully Completed!**\n\n"
+                     f"📂 Total Saved: `{total_files}`\n"
+                     f"⏩ Duplicates: `{duplicate}`\n"
+                     f"❌ Errors: `{errors}`\n"
+                     f"🗑️ Deleted/Empty: `{deleted}`\n"
+                     f"🚫 Non-Media: `{no_media + unsupported}`"
+            )
